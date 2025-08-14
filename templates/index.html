@@ -1,0 +1,169 @@
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>PRISM 2.0 – Test di Autovalutazione</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f8f9fa;
+  margin: 0;
+  padding: 0;
+}
+
+header {
+  background: #4b0082;
+  color: #fff;
+  padding: 15px;
+  text-align: center;
+}
+
+.container {
+  max-width: 800px;
+  margin: 30px auto;
+  padding: 20px;
+}
+
+h1 {
+  color: #4b0082;
+}
+
+button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+#entra-btn {
+  background: #4b0082;
+  color: #fff;
+  font-size: 1.2em;
+  margin-top: 20px;
+}
+
+#entra-btn:disabled {
+  background: #999;
+  cursor: not-allowed;
+}
+
+#chat-container {
+  display: none;
+  margin-top: 20px;
+}
+
+textarea {
+  width: 100%;
+  height: 80px;
+  margin-bottom: 10px;
+}
+
+/* Popup */
+.popup-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.6);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 9999;
+}
+.popup-content {
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  max-width: 500px;
+  width: 90%;
+}
+.popup-buttons {
+  margin-top: 20px;
+  text-align: right;
+}
+.popup-buttons button {
+  padding: 8px 16px;
+  margin-left: 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+#accetto { background: #2d8f2d; color: #fff; }
+#annulla { background: #bbb; color: #000; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>PRISM 2.0 – Test di Autovalutazione</h1>
+  <small>Strumento sperimentale in fase di validazione</small>
+</header>
+
+<div class="container">
+  <p>Benvenuto in PRISM 2.0, un test gratuito e anonimo disponibile 24h su 24.  
+  PRISM è uno strumento di intelligenza artificiale progettato per rilevare possibili indicatori di rischio tramite 10 domande aperte.  
+  Non è una diagnosi, non sostituisce il personale specializzato ed è paragonabile a un termometro: indica soltanto il livello di rischio rilevato.</p>
+
+  <button id="entra-btn" disabled>Entra in PRISM</button>
+
+  <div id="chat-container">
+    <div id="ai-response"></div>
+    <textarea id="user-input" placeholder="Scrivi qui la tua risposta..."></textarea>
+    <button id="send">Invia</button>
+  </div>
+</div>
+
+<!-- Popup Consenso -->
+<div id="popup-consenso" class="popup-overlay">
+  <div class="popup-content">
+    <h2>Consenso Informato</h2>
+    <p>
+      Questo test è uno strumento sperimentale basato su intelligenza artificiale.  
+      Non è validato come diagnosi clinica o valutazione ufficiale.  
+      L’uso è anonimo, gratuito e i dati non vengono memorizzati.  
+      L’AI si limita ad analizzare le risposte per generare un indicatore di rischio.  
+      Accedendo, confermi di aver compreso queste condizioni.
+    </p>
+    <div class="popup-buttons">
+      <button id="accetto">ACCETTO</button>
+      <button id="annulla">ANNULLA</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Abilita il pulsante solo se l'utente accetta
+document.getElementById('accetto').addEventListener('click', function() {
+  document.getElementById('popup-consenso').style.display = 'none';
+  document.getElementById('entra-btn').disabled = false;
+});
+
+// Se annulla, il pulsante resta disabilitato
+document.getElementById('annulla').addEventListener('click', function() {
+  document.getElementById('popup-consenso').style.display = 'none';
+  document.getElementById('entra-btn').disabled = true;
+});
+
+// Clic su "Entra in PRISM"
+document.getElementById('entra-btn').addEventListener('click', function() {
+  document.getElementById('chat-container').style.display = 'block';
+  document.getElementById('ai-response').textContent =
+    "Benvenuta. Per le prossime 10 interazioni farò solo domande aperte senza commenti. Sei pronta?";
+});
+
+// Invio al backend
+document.getElementById('send').addEventListener('click', async function() {
+  const userText = document.getElementById('user-input').value;
+  document.getElementById('user-input').value = '';
+
+  const resp = await fetch('/chat', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ userInput: userText })
+  });
+
+  const data = await resp.json();
+  document.getElementById('ai-response').textContent = data.reply || 'Errore nella risposta';
+});
+</script>
+
+</body>
+</html>
