@@ -4,11 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PRISM 2.0 – Test di Autovalutazione</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 
-<!-- Schermata di consenso iniziale -->
 <div id="popup-consenso" class="popup-overlay">
     <div class="popup-content">
         <h2>Consenso Informato</h2>
@@ -27,14 +26,12 @@
     </div>
 </div>
 
-<!-- Interfaccia di chat a schermo intero, visibile dopo il consenso -->
 <div id="chat-container">
     <header>
         <h1>PRISM 2.0</h1>
     </header>
     <div class="chat-messages" id="chat-messages">
-        <!-- I messaggi della chat verranno aggiunti qui dinamicamente -->
-    </div>
+        </div>
     <div class="chat-input-area">
         <textarea id="user-input" placeholder="Scrivi qui la tua risposta..."></textarea>
         <button id="send-btn">Invia</button>
