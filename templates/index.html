@@ -1,91 +1,120 @@
-
 <!DOCTYPE html>
 <html lang="it">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PRISM 2.0 – Test di Autovalutazione</title>
 <style>
 body {
-  font-family: Arial, sans-serif;
-  background-color: #f8f9fa;
-  margin: 0;
-  padding: 0;
+  font-family: Arial, sans-serif;
+  background-color: #f8f9fa;
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
+  box-sizing: border-box;
 }
 
 header {
-  background: #4b0082;
-  color: #fff;
-  padding: 15px;
-  text-align: center;
+  background: #4b0082;
+  color: #fff;
+  padding: 15px;
+  text-align: center;
 }
 
 .container {
-  max-width: 800px;
-  margin: 30px auto;
-  padding: 20px;
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  background: #fff;
 }
 
 h1 {
-  color: #4b0082;
+  color: #4b0082;
+  font-size: 1.5em;
 }
 
 button {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  width: 100%;
 }
 
 #entra-btn {
-  background: #4b0082;
-  color: #fff;
-  font-size: 1.2em;
-  margin-top: 20px;
+  background: #4b0082;
+  color: #fff;
+  font-size: 1.1em;
+  margin-top: 20px;
 }
 
 #entra-btn:disabled {
-  background: #999;
-  cursor: not-allowed;
+  background: #999;
+  cursor: not-allowed;
 }
 
 #chat-container {
-  display: none;
-  margin-top: 20px;
+  display: none;
+  margin-top: 20px;
+}
+
+#ai-response {
+  white-space: pre-wrap;
+  margin-bottom: 10px;
+  background: #e9ecef;
+  padding: 10px;
+  border-radius: 6px;
 }
 
 textarea {
-  width: 100%;
-  height: 80px;
-  margin-bottom: 10px;
+  width: 100%;
+  height: 100px;
+  margin-bottom: 10px;
+  padding: 10px;
+  box-sizing: border-box;
+  border-radius: 6px;
+  border: 1px solid #ccc;
 }
 
 /* Popup */
 .popup-overlay {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.6);
-  display: flex; align-items: center; justify-content: center;
-  z-index: 9999;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+  box-sizing: border-box;
 }
 .popup-content {
-  background: #fff;
-  padding: 20px;
-  border-radius: 12px;
-  max-width: 500px;
-  width: 90%;
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  max-width: 90%;
+  width: 90%;
 }
+
 .popup-buttons {
-  margin-top: 20px;
-  text-align: right;
+  margin-top: 20px;
+  text-align: right;
 }
+
 .popup-buttons button {
-  padding: 8px 16px;
-  margin-left: 10px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
+  padding: 8px 16px;
+  margin-left: 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  width: auto;
 }
+
 #accetto { background: #2d8f2d; color: #fff; }
 #annulla { background: #bbb; color: #000; }
 </style>
@@ -93,75 +122,74 @@ textarea {
 <body>
 
 <header>
-  <h1>PRISM 2.0 – Test di Autovalutazione</h1>
-  <small>Strumento sperimentale in fase di validazione</small>
+  <h1>PRISM 2.0 – Test di Autovalutazione</h1>
+  <small>Strumento sperimentale in fase di validazione</small>
 </header>
 
 <div class="container">
-  <p>Benvenuto in PRISM 2.0, un test gratuito e anonimo disponibile 24h su 24.  
-  PRISM è uno strumento di intelligenza artificiale progettato per rilevare possibili indicatori di rischio tramite 10 domande aperte.  
-  Non è una diagnosi, non sostituisce il personale specializzato ed è paragonabile a un termometro: indica soltanto il livello di rischio rilevato.</p>
+  <p>Benvenuto in PRISM 2.0, un test gratuito e anonimo disponibile 24h su 24.
+  PRISM è uno strumento di intelligenza artificiale progettato per rilevare possibili indicatori di rischio tramite 10 domande aperte.
+  Non è una diagnosi, non sostituisce il personale specializzato ed è paragonabile a un termometro: indica soltanto il livello di rischio rilevato.</p>
 
-  <button id="entra-btn" disabled>Entra in PRISM</button>
+  <button id="entra-btn" disabled>Entra in PRISM</button>
 
-  <div id="chat-container">
-    <div id="ai-response"></div>
-    <textarea id="user-input" placeholder="Scrivi qui la tua risposta..."></textarea>
-    <button id="send">Invia</button>
-  </div>
+  <div id="chat-container">
+    <div id="ai-response"></div>
+    <textarea id="user-input" placeholder="Scrivi qui la tua risposta..."></textarea>
+    <button id="send">Invia</button>
+  </div>
 </div>
 
-<!-- Popup Consenso -->
 <div id="popup-consenso" class="popup-overlay">
-  <div class="popup-content">
-    <h2>Consenso Informato</h2>
-    <p>
-      Questo test è uno strumento sperimentale basato su intelligenza artificiale.  
-      Non è validato come diagnosi clinica o valutazione ufficiale.  
-      L’uso è anonimo, gratuito e i dati non vengono memorizzati.  
-      L’AI si limita ad analizzare le risposte per generare un indicatore di rischio.  
-      Accedendo, confermi di aver compreso queste condizioni.
-    </p>
-    <div class="popup-buttons">
-      <button id="accetto">ACCETTO</button>
-      <button id="annulla">ANNULLA</button>
-    </div>
-  </div>
+  <div class="popup-content">
+    <h2>Consenso Informato</h2>
+    <p>
+      Questo test è uno strumento sperimentale basato su intelligenza artificiale.
+      Non è validato come diagnosi clinica o valutazione ufficiale.
+      L’uso è anonimo, gratuito e i dati non vengono memorizzati.
+      L’AI si limita ad analizzare le risposte per generare un indicatore di rischio.
+      Accedendo, confermi di aver compreso queste condizioni.
+    </p>
+    <div class="popup-buttons">
+      <button id="accetto">ACCETTO</button>
+      <button id="annulla">ANNULLA</button>
+    </div>
+  </div>
 </div>
 
 <script>
 // Abilita il pulsante solo se l'utente accetta
 document.getElementById('accetto').addEventListener('click', function() {
-  document.getElementById('popup-consenso').style.display = 'none';
-  document.getElementById('entra-btn').disabled = false;
+  document.getElementById('popup-consenso').style.display = 'none';
+  document.getElementById('entra-btn').disabled = false;
 });
 
 // Se annulla, il pulsante resta disabilitato
 document.getElementById('annulla').addEventListener('click', function() {
-  document.getElementById('popup-consenso').style.display = 'none';
-  document.getElementById('entra-btn').disabled = true;
+  document.getElementById('popup-consenso').style.display = 'none';
+  document.getElementById('entra-btn').disabled = true;
 });
 
 // Clic su "Entra in PRISM"
 document.getElementById('entra-btn').addEventListener('click', function() {
-  document.getElementById('chat-container').style.display = 'block';
-  document.getElementById('ai-response').textContent =
-    "Benvenuta. Per le prossime 10 interazioni farò solo domande aperte senza commenti. Sei pronta?";
+  document.getElementById('chat-container').style.display = 'block';
+  document.getElementById('ai-response').textContent =
+    "Benvenuta. Per le prossime 10 interazioni farò solo domande aperte senza commenti. Sei pronta?";
 });
 
 // Invio al backend
 document.getElementById('send').addEventListener('click', async function() {
-  const userText = document.getElementById('user-input').value;
-  document.getElementById('user-input').value = '';
+  const userText = document.getElementById('user-input').value;
+  document.getElementById('user-input').value = '';
 
-  const resp = await fetch('/chat', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({ userInput: userText })
-  });
+  const resp = await fetch('/chat', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ userInput: userText })
+  });
 
-  const data = await resp.json();
-  document.getElementById('ai-response').textContent = data.reply || 'Errore nella risposta';
+  const data = await resp.json();
+  document.getElementById('ai-response').textContent = data.reply || 'Errore nella risposta';
 });
 </script>
 
