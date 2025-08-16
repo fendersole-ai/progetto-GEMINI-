@@ -15,7 +15,7 @@ header {
 }
 
 .container {
-    max-width: 600px;
+    max-width: 90%; /* Ho modificato questo valore per una larghezza più flessibile */
     margin: 20px auto;
     padding: 15px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
