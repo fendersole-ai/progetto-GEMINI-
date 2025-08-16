@@ -1,3 +1,4 @@
+/* style.css */
 body {
     font-family: 'Helvetica Neue', Arial, sans-serif;
     background-color: #f0f2f5;
@@ -64,11 +65,11 @@ body {
 /* ------------------ Interfaccia di chat ------------------ */
 
 #chat-container {
-    display: none; /* Nascondi all'inizio */
+    display: none;
     flex-direction: column;
     width: 100%;
     height: 100vh;
-    max-width: 600px; /* Limita la larghezza per desktop */
+    max-width: 600px;
     margin: 0 auto;
     background: #fff;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -128,7 +129,8 @@ body {
     font-size: 16px;
     background-color: #fff;
     resize: none;
-    max-height: 100px; /* Limita l'altezza per evitare di occupare troppo spazio */
+    /* Rimosse le proprietà height e min-height */
+    max-height: 100px;
     overflow-y: auto;
 }
 
