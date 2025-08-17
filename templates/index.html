@@ -1,116 +1,231 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
+
 <html lang="it">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PRISM 2.0 – Test di Autovalutazione</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>PRISM 2.0 – Test di Autovalutazione</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
 </head>
+
 <body>
 
+
+
 <div id="popup-consenso" class="popup-overlay">
-    <div class="popup-content">
-        <h2>Consenso Informato</h2>
-        <p>
-            Benvenuto in PRISM 2.0, un test gratuito e anonimo disponibile 24h su 24.
-            PRISM è uno strumento di intelligenza artificiale progettato per rilevare possibili indicatori di rischio tramite 10 domande aperte.
-            Non è una diagnosi, non sostituisce il personale specializzato ed è paragonabile a un termometro: indica soltanto il livello di rischio rilevato.
-        </p>
-        <p>
-            Questo test è uno strumento sperimentale basato su intelligenza artificiale. Non è validato come diagnosi clinica o valutazione ufficiale. L’uso è anonimo, gratuito e i dati non vengono memorizzati. L’AI si limita ad analizzare le risposte per generare un indicatore di rischio. Accedendo, confermi di aver compreso queste condizioni.
-        </p>
-        <div class="popup-buttons">
-            <button id="accetto">ACCETTO</button>
-            <button id="annulla">ANNULLA</button>
-        </div>
-    </div>
+
+    <div class="popup-content">
+
+        <h2>Consenso Informato</h2>
+
+        <p>
+
+            Benvenuto in PRISM 2.0, un test gratuito e anonimo disponibile 24h su 24.
+
+            PRISM è uno strumento di intelligenza artificiale progettato per rilevare possibili indicatori di rischio tramite 10 domande aperte.
+
+            Non è una diagnosi, non sostituisce il personale specializzato ed è paragonabile a un termometro: indica soltanto il livello di rischio rilevato.
+
+        </p>
+
+        <p>
+
+            Questo test è uno strumento sperimentale basato su intelligenza artificiale. Non è validato come diagnosi clinica o valutazione ufficiale. L’uso è anonimo, gratuito e i dati non vengono memorizzati. L’AI si limita ad analizzare le risposte per generare un indicatore di rischio. Accedendo, confermi di aver compreso queste condizioni.
+
+        </p>
+
+        <div class="popup-buttons">
+
+            <button id="accetto">ACCETTO</button>
+
+            <button id="annulla">ANNULLA</button>
+
+        </div>
+
+    </div>
+
 </div>
+
+
 
 <div id="chat-container">
-    <header>
-        <h1>PRISM 2.0</h1>
-    </header>
-    <div class="chat-messages" id="chat-messages">
-        </div>
-    <div class="chat-input-area">
-        <textarea id="user-input" placeholder="Scrivi qui la tua risposta..."></textarea>
-        <button id="send-btn">Invia</button>
-    </div>
+
+    <header>
+
+        <h1>PRISM 2.0</h1>
+
+    </header>
+
+    <div class="chat-messages" id="chat-messages">
+
+        </div>
+
+    <div class="chat-input-area">
+
+        <textarea id="user-input" placeholder="Scrivi qui la tua risposta..."></textarea>
+
+        <button id="send-btn">Invia</button>
+
+    </div>
+
 </div>
 
+
+
 <script>
+
 document.addEventListener('DOMContentLoaded', () => {
-    const popupConsenso = document.getElementById('popup-consenso');
-    const chatContainer = document.getElementById('chat-container');
-    const accettoBtn = document.getElementById('accetto');
-    const annullaBtn = document.getElementById('annulla');
-    const sendBtn = document.getElementById('send-btn');
-    const userInput = document.getElementById('user-input');
-    const chatMessages = document.getElementById('chat-messages');
 
-    // Funzione per inviare un messaggio
-    async function sendMessage() {
-        const userText = userInput.value.trim();
-        if (userText === '') return;
+    const popupConsenso = document.getElementById('popup-consenso');
 
-        // Aggiunge il messaggio dell'utente alla chat
-        addMessageToChat(userText, 'user-message');
-        userInput.value = '';
+    const chatContainer = document.getElementById('chat-container');
 
-        try {
-            const resp = await fetch('/chat', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ userInput: userText })
-            });
-            const data = await resp.json();
-            addMessageToChat(data.reply, 'ai-message');
-        } catch (error) {
-            addMessageToChat("Si è verificato un errore. Per favore, riprova.", 'ai-message');
-        }
-    }
+    const accettoBtn = document.getElementById('accetto');
 
-    // Funzione per aggiungere un messaggio al contenitore della chat
-    function addMessageToChat(text, sender) {
-        const messageDiv = document.createElement('div');
-        messageDiv.classList.add('message', sender);
-        messageDiv.textContent = text;
-        chatMessages.appendChild(messageDiv);
-        chatMessages.scrollTop = chatMessages.scrollHeight; // Scrolla automaticamente in basso
-    }
+    const annullaBtn = document.getElementById('annulla');
 
-    // Clic su "ACCETTO"
-    accettoBtn.addEventListener('click', () => {
-        popupConsenso.style.display = 'none';
-        chatContainer.style.display = 'flex';
-        // Invia il primo messaggio al backend per avviare il protocollo
-        fetch('/chat', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ userInput: 'si' }) // Invia 'si' per avviare
-        })
-        .then(response => response.json())
-        .then(data => addMessageToChat(data.reply, 'ai-message'))
-        .catch(error => addMessageToChat("Si è verificato un errore. Per favore, riprova.", 'ai-message'));
-    });
+    const sendBtn = document.getElementById('send-btn');
 
-    // Clic su "ANNULLA"
-    annullaBtn.addEventListener('click', () => {
-        alert("Hai annullato. Ricarica la pagina per riprovare.");
-    });
+    const userInput = document.getElementById('user-input');
 
-    // Clic sul pulsante "Invia"
-    sendBtn.addEventListener('click', sendMessage);
+    const chatMessages = document.getElementById('chat-messages');
 
-    // Invio con il tasto "Invio" sulla tastiera
-    userInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            e.preventDefault(); // Evita il newline nella textarea
-            sendMessage();
-        }
-    });
+
+
+    // Funzione per inviare un messaggio
+
+    async function sendMessage() {
+
+        const userText = userInput.value.trim();
+
+        if (userText === '') return;
+
+
+
+        // Aggiunge il messaggio dell'utente alla chat
+
+        addMessageToChat(userText, 'user-message');
+
+        userInput.value = '';
+
+
+
+        try {
+
+            const resp = await fetch('/chat', {
+
+                method: 'POST',
+
+                headers: {'Content-Type': 'application/json'},
+
+                body: JSON.stringify({ userInput: userText })
+
+            });
+
+            const data = await resp.json();
+
+            addMessageToChat(data.reply, 'ai-message');
+
+        } catch (error) {
+
+            addMessageToChat("Si è verificato un errore. Per favore, riprova.", 'ai-message');
+
+        }
+
+    }
+
+
+
+    // Funzione per aggiungere un messaggio al contenitore della chat
+
+    function addMessageToChat(text, sender) {
+
+        const messageDiv = document.createElement('div');
+
+        messageDiv.classList.add('message', sender);
+
+        messageDiv.textContent = text;
+
+        chatMessages.appendChild(messageDiv);
+
+        chatMessages.scrollTop = chatMessages.scrollHeight; // Scrolla automaticamente in basso
+
+    }
+
+
+
+    // Clic su "ACCETTO"
+
+    accettoBtn.addEventListener('click', () => {
+
+        popupConsenso.style.display = 'none';
+
+        chatContainer.style.display = 'flex';
+
+        // Invia il primo messaggio al backend per avviare il protocollo
+
+        fetch('/chat', {
+
+            method: 'POST',
+
+            headers: {'Content-Type': 'application/json'},
+
+            body: JSON.stringify({ userInput: 'si' }) // Invia 'si' per avviare
+
+        })
+
+        .then(response => response.json())
+
+        .then(data => addMessageToChat(data.reply, 'ai-message'))
+
+        .catch(error => addMessageToChat("Si è verificato un errore. Per favore, riprova.", 'ai-message'));
+
+    });
+
+
+
+    // Clic su "ANNULLA"
+
+    annullaBtn.addEventListener('click', () => {
+
+        alert("Hai annullato. Ricarica la pagina per riprovare.");
+
+    });
+
+
+
+    // Clic sul pulsante "Invia"
+
+    sendBtn.addEventListener('click', sendMessage);
+
+
+
+    // Invio con il tasto "Invio" sulla tastiera
+
+    userInput.addEventListener('keypress', (e) => {
+
+        if (e.key === 'Enter') {
+
+            e.preventDefault(); // Evita il newline nella textarea
+
+            sendMessage();
+
+        }
+
+    });
+
 });
+
 </script>
 
+
+
 </body>
+
 </html>
