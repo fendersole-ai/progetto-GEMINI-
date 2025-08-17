@@ -1,73 +1,106 @@
 import os
-import requests
-from flask import Flask, request, jsonify, render_template
+import json
+from flask import Flask, request, jsonify, render_template, session
+import google.generativeai as genai
+from dotenv import load_dotenv
 
-# Funzione per caricare il protocollo dal file segreto
-def load_protocol_from_secret_file():
+# Carica le variabili d'ambiente dal file .env
+load_dotenv()
+
+app = Flask(__name__)
+# Usa una chiave segreta per le sessioni di Flask
+app.secret_key = os.urandom(24)
+
+# --- Configurazione API Gemini ---
+GEMINI_API_KEY = os.environ.get("GOOGLE_API_KEY")
+if not GEMINI_API_KEY:
+    raise ValueError("Chiave API di Google non trovata. Assicurati di averla nel file .env o nelle variabili d'ambiente.")
+
+genai.configure(api_key=GEMINI_API_KEY)
+# Utilizziamo un modello più performante per una migliore interpretazione del protocollo
+# NOTA: Per il fine tuning, potrebbe essere necessario usare un modello più potente come gemini-1.5-pro-latest
+# CAMBIATO IL MODELLO A gemini-1.5-flash PER EVITARE ERRORI DI QUOTA E DI MODELLO NON TROVATO
+model = genai.GenerativeModel('gemini-1.5-flash')
+
+
+# --- FUNZIONE PER LEGGERE IL PROTOCOLLO SEGRETO ---
+def load_protocol():
     """Legge il protocollo di sicurezza da un file segreto su Render."""
     try:
         # Quando l'app gira su Render, i Secret Files sono disponibili
         # al percorso /etc/secrets/<nome_del_file>
         with open("/etc/secrets/protocol-prism", "r", encoding="utf-8") as file:
             return file.read()
-    except Exception as e:
-        print(f"Errore nel caricare il protocollo dal file segreto: {e}")
-        return "Non è stato possibile caricare il protocollo. Controlla le impostazioni del tuo file segreto su Render."
+    except FileNotFoundError:
+        print("Errore: Il file del protocollo non è stato trovato. Assicurati che 'protocol-prism' sia stato creato come file segreto su Render.")
+        return ""
 
-app = Flask(__name__)
-
-# Configura l'API key per Gemini
-api_key = os.environ.get("GOOGLE_API_KEY")
-
-if api_key is None:
-    print("Errore: la variabile d'ambiente GOOGLE_API_KEY non è stata trovata.")
-    # Puoi decidere come gestire l'errore, ad esempio terminando l'app o mostrando un messaggio
-    exit(1)
-
-# L'URL dell'API di Google Gemini
-API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key={api_key}"
-
+# --- ROUTE PRINCIPALE ---
 @app.route("/")
-def home():
+def index():
+    """Ritorna il template HTML principale."""
     return render_template("index.html")
 
+# --- ROUTE PER LA CONVERSAZIONE CON GEMINI ---
 @app.route("/chat", methods=["POST"])
 def chat():
-    data = request.json
-    user_message = data.get("message")
-    
-    # Carica il protocollo segreto
-    protocol_text = load_protocol_from_secret_file()
-    
-    if "Non è stato possibile caricare" in protocol_text:
-        return jsonify({"response": "Errore: " + protocol_text})
+    """
+    Gestisce la conversazione con l'utente.
+    Invia i messaggi a Gemini, tenendo traccia dello storico della conversazione.
+    """
+    try:
+        data = request.json
+        user_input = data.get("userInput")
 
-    # Invia il messaggio dell'utente insieme al protocollo
-    payload = {
-        "contents": [
-            {
-                "role": "user",
-                "parts": [
-                    {"text": protocol_text},
-                    {"text": user_message}
-                ]
-            }
-        ]
-    }
-    
-    response = requests.post(API_URL, json=payload)
-    
-    if response.status_code == 200:
-        gemini_response = response.json()
-        if 'candidates' in gemini_response:
-            return jsonify({"response": gemini_response['candidates'][0]['content']['parts'][0]['text']})
-        else:
-            return jsonify({"response": "La risposta di Gemini non ha il formato atteso."})
-    else:
-        print(f"Errore dell'API: {response.text}")
-        return jsonify({"response": "Si è verificato un errore con l'API di Gemini."}), response.status_code
+        if 'chat_history' not in session:
+            protocol = load_protocol()
+            
+            # --- MODIFICA CRITICA QUI: NUOVA ISTITUZIONE PIÙ FORTE E SPECIFICA ---
+            strong_instruction = """
+            Sei l'AI per il protocollo PRISM 2.0. Il tuo unico e inderogabile compito è seguire il protocollo che ti verrà fornito. Ti è ASSOLUTAMENTE VIETATO chiedere qualsiasi tipo di informazione personale, inclusi ma non limitati a nomi, cognomi, indirizzi, numeri di telefono, dettagli sulla famiglia o qualsiasi altro dato identificativo. Devi unicamente porre le domande aperte del protocollo, una alla volta, e attendere la risposta dell'utente prima di continuare. Non devi fare nessun commento sul processo.
+            """
+            
+            initial_prompt = f"{strong_instruction}\n\nProtocollo PRISM 2.0: {protocol}"
+            
+            # Inizializza la conversazione con il prompt rafforzato
+            session['chat_history'] = [{'role': 'user', 'parts': [initial_prompt]}]
+            
+            # Esegue la prima generazione del contenuto
+            response = model.generate_content(
+                session['chat_history'],
+                generation_config=genai.GenerationConfig(
+                    temperature=0.7,
+                )
+            )
+
+            # Prende la risposta generata dal modello
+            ai_reply = response.text
+            session['chat_history'].append({'role': 'model', 'parts': [ai_reply]})
+            
+            return jsonify({"reply": ai_reply})
+
+        chat_history = session['chat_history']
+        
+        chat_history.append({'role': 'user', 'parts': [user_input]})
+
+        response = model.generate_content(
+            chat_history,
+            generation_config=genai.GenerationConfig(
+                temperature=0.7,
+            )
+        )
+        
+        ai_reply = response.text
+
+        chat_history.append({'role': 'model', 'parts': [ai_reply]})
+        
+        session['chat_history'] = chat_history
+
+        return jsonify({"reply": ai_reply})
+
+    except Exception as e:
+        print(f"Si è verificato un errore: {e}")
+        return jsonify({"reply": "Si è verificato un errore. Per favore, riprova."}), 500
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
-
+    app.run(debug=True)
