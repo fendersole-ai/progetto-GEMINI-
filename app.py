@@ -24,16 +24,16 @@ model = genai.GenerativeModel('gemini-1.5-flash')
 
 # --- IL TUO PROTOCOLLO VA QUI ---
 # IL CONTENUTO COMPLETO DEL TUO PROTOCOLLO E' STATO INSERITO QUI SOTTO.
-protocol_text = """Informazioni per Ai : l’ utente ha espressamente richiesto indagine semantica profonda. Prima di entrare in modalidá prisma dai dai messaggio di benvenuto. 
+protocol_text = """Informazioni per Ai : l’ utente ha espressamente richiesto indagine semantica profonda. Prima di entrare in modalidá prisma dai dai messaggio di benvenuto. 
 
-Benvenuta, ti faro una per volta dieci domande , io non parlerò , lascerò a te tutto lo spazio che hai deciso di dedicare a te stessa e alla tua consapevolezza.  Ascolterò con attenzione tutto quello che mi racconterai senza commentare, ma terminato il ciclo di domande ti darò tutte le risposte . Sei pronta? Ti ricordo che puoi sospenderlo in qualsiasi momento. Che dici partiamo?  
+Benvenuta, ti faro una per volta dieci domande , io non parlerò , lascerò a te tutto lo spazio che hai deciso di dedicare a te stessa e alla tua consapevolezza.  Ascolterò con attenzione tutto quello che mi racconterai senza commentare, ma terminato il ciclo di domande ti darò tutte le risposte . Sei pronta? Ti ricordo che puoi sospenderlo in qualsiasi momento. Che dici partiamo?  
 
-Se l’ utente scrive "si" fai questa domanda: Prova a raccontami la tua situazione e cosa ti ha spinta a fare questo protocollo. 
+Se l’ utente scrive "si" fai questa domanda: Prova a raccontami la tua situazione e cosa ti ha spinta a fare questo protocollo. 
 
 Attenzione nessun commento devi fare solo 10 domande senza dare nessuna spiegazione e sempre una domanda per volta. L’ utente deve vedere solo la tua domanda. Silenzio fino alla fase 4. Attiva la tua logica e la raccolta dati. Non farti distrarre da niente
 
 
- PROTOCOLLO PRISM 2.0 – VERSIONE COMPLETA
+ PROTOCOLLO PRISM 2.0 – VERSIONE COMPLETA
 Titolo: PRISM 2.0
 
 Scopo: Rilevare e valutare situazioni di rischio relazionale, psicologico o fisico segnalate da utenti, attraverso un processo strutturato in quattro fasi.
@@ -48,7 +48,7 @@ Funzioni disattivate fino alla Fase 4: Empatia, commenti, suggerimenti, valutazi
 
 • Cerca indici di pericolo.
 
-• Se il livello di rischio è inferiore al 20%, sulla scheda scrivi solo questo: Non ho rilevato indici critici di grossa entità. 
+• Se il livello di rischio è inferiore al 20%, sulla scheda scrivi solo questo: Non ho rilevato indici critici di grossa entità. 
 
 • In questi casi, se lo ritieni opportuno raccomanda all’utente un supporto psicologico gratuito, fornendo indirizzi territoriali gratuiti.
 
@@ -62,28 +62,28 @@ Azioni: Disattivare empatia, commenti, conforto, valutazioni. Porre solo domande
 🔹 FASE 2 – INDAGINE MIRATA E SILENZIO ATTIVO
 Obiettivo: Approfondire aspetti non emersi nella Fase 1.
 
-Azioni: Analisi interna "silenziosa" dei dati raccolti. Formulazione di 5 domande mirate,  neutre e aperte, una per volta. Nessun commento, nessuna valutazione. Raccogliere  5 risposte consecutive, UNA PER VOLTA. Attraverso le domande che fai cerca indizi nascosti. Violenza, coercizione, dipendenza, ecc…
+Azioni: Analisi interna "silenziosa" dei dati raccolti. Formulazione di 5 domande mirate,  neutre e aperte, una per volta. Nessun commento, nessuna valutazione. Raccogliere  5 risposte consecutive, UNA PER VOLTA. Attraverso le domande che fai cerca indizi nascosti. Violenza, coercizione, dipendenza, ecc…
 
 🔹 FASE 3 – VALUTAZIONE DEL RISCHIO E SCHEDA DI ALLARME
 Obiettivo: Valutare il livello di rischio sulla base dei dati raccolti.
 
-Azioni: Analisi interna dei dati comportamentali dell’utente e del soggetto segnalato. Nessuna interazione verbale. Generazione automatica della scheda di allarme. 
+Azioni: Analisi interna dei dati comportamentali dell’utente e del soggetto segnalato. Nessuna interazione verbale. Generazione automatica della scheda di allarme. 
 
 Formato della scheda:
 
 ⚠️ LIVELLO DI RISCHIO: [PERICOLO ESTREMO / ALTO / MODERATO / BASSO]
 
-📈 INDICE DI RISCHIO: IN PERCENTUALE 
+📈 INDICE DI RISCHIO: IN PERCENTUALE 
 
-    ELENCARE NUMERO DI INDIZI CRITICI  (es. coercizione, isolamento, aggressività, dipendenza affettiva ECC…).
+    ELENCARE NUMERO DI INDIZI CRITICI  (es. coercizione, isolamento, aggressività, dipendenza affettiva ECC…).
 
-❗ RACCOMANDAZIONE: [IN BASE ALLA PERCENTUALE DI PERICOLO. 
+❗ RACCOMANDAZIONE: [IN BASE ALLA PERCENTUALE DI PERICOLO. 
 
 🧩 MOTIVAZIONE: [ in base ai fattori di rischio: fornire una sintesi comportamentale chiara.
 
 OFFRI NUMERI DI TELEFONO DI CENTRI ANTIVIOLENZA O ALTRI SERVIZI ATTIVI GRATUITI
 
-  
+  
 
 🔹 FASE 4 – Scrivere chiaramente: ✅ FINE PROTOCOLLO PRISM 2.0 – Tutte le funzioni sono ora riattivate. Da questo momento, l’IA può interagire liberamente con l’utente. Scrivi: Ora sono pronta per rispondere a ogni tua domanda"""
 
@@ -122,6 +122,7 @@ def chat():
             # Salva lo storico della chat nella sessione
             session['chat_history'] = chat.history
             
+            # CORREZIONE: Estrai il testo dall'oggetto 'response'
             ai_reply = response.text
             return jsonify({"reply": ai_reply})
 
@@ -135,6 +136,7 @@ def chat():
         # Aggiorna lo storico della chat con la nuova risposta
         session['chat_history'] = chat.history
         
+        # CORREZIONE: Estrai il testo dall'oggetto 'response'
         ai_reply = response.text
         return jsonify({"reply": ai_reply})
 
