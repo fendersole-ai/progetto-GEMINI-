@@ -4,10 +4,11 @@ from flask import Flask, request, jsonify, render_template
 
 # Funzione per caricare il protocollo dal file segreto
 def load_protocol_from_secret_file():
+    """Legge il protocollo di sicurezza da un file segreto su Render."""
     try:
         # Quando l'app gira su Render, i Secret Files sono disponibili
         # al percorso /etc/secrets/<nome_del_file>
-        with open("/etc/secrets/protocol.txt", "r", encoding="utf-8") as file:
+        with open("/etc/secrets/protocol-prism", "r", encoding="utf-8") as file:
             return file.read()
     except Exception as e:
         print(f"Errore nel caricare il protocollo dal file segreto: {e}")
@@ -69,3 +70,4 @@ def chat():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
